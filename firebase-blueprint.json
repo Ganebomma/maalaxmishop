@@ -1,0 +1,150 @@
+{
+  "entities": {
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer profile for mobile store shoppers",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 15 },
+        "email": { "type": "string", "maxLength": 120 },
+        "address": { "type": "string", "maxLength": 250 },
+        "city": { "type": "string", "maxLength": 60 },
+        "state": { "type": "string", "maxLength": 60 },
+        "pincode": { "type": "string", "maxLength": 10 },
+        "profileImageUrl": { "type": "string", "maxLength": 500 },
+        "preferredLanguage": { "type": "string", "enum": ["en", "hi"] },
+        "role": { "type": "string", "enum": ["customer"] },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLoginAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "phone", "role"]
+    },
+    "StaffUser": {
+      "title": "StaffUser",
+      "description": "Store employees, managers, cashiers, technicians, and owners",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 15 },
+        "role": { "type": "string", "enum": ["owner", "manager", "cashier", "technician"] },
+        "isActive": { "type": "boolean" },
+        "permissions": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLoginAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Mobile phone or electronic accessory",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 150 },
+        "brand": { "type": "string", "maxLength": 60 },
+        "model": { "type": "string", "maxLength": 60 },
+        "category": { "type": "string", "enum": ["phone", "accessory", "audio", "wearable"] },
+        "variant": { "type": "string", "maxLength": 60 },
+        "color": { "type": "string", "maxLength": 40 },
+        "ram": { "type": "string", "maxLength": 20 },
+        "storage": { "type": "string", "maxLength": 20 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "hsnCode": { "type": "string", "maxLength": 20 },
+        "gstRate": { "type": "number" },
+        "mrp": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "purchasePrice": { "type": "number" },
+        "wholesalePrice": { "type": "number" },
+        "stockQuantity": { "type": "number" },
+        "lowStockAlert": { "type": "number" },
+        "images": { "type": "string", "maxLength": 1000 },
+        "barcode": { "type": "string", "maxLength": 50 },
+        "isEMIAvailable": { "type": "boolean" },
+        "isActive": { "type": "boolean" },
+        "isFeatured": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["productId", "name", "brand", "sellingPrice", "stockQuantity"]
+    },
+    "EmiEnquiry": {
+      "title": "EmiEnquiry",
+      "description": "Customer EMI eligibility inquiry",
+      "type": "object",
+      "properties": {
+        "enquiryId": { "type": "string", "maxLength": 64 },
+        "customerUid": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 100 },
+        "mobileNumber": { "type": "string", "maxLength": 15 },
+        "productId": { "type": "string", "maxLength": 64 },
+        "productName": { "type": "string", "maxLength": 150 },
+        "monthlyIncome": { "type": "number" },
+        "employmentType": { "type": "string", "enum": ["Salaried", "Self-Employed", "Business", "Student"] },
+        "preferredDownPayment": { "type": "number" },
+        "preferredTenure": { "type": "number" },
+        "aadhaarAvailable": { "type": "boolean" },
+        "panAvailable": { "type": "boolean" },
+        "bankAccountAvailable": { "type": "boolean" },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["pending", "verified", "approved", "rejected", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["enquiryId", "customerName", "mobileNumber", "status"]
+    },
+    "RepairJob": {
+      "title": "RepairJob",
+      "description": "Mobile service and repair job card",
+      "type": "object",
+      "properties": {
+        "repairId": { "type": "string", "maxLength": 64 },
+        "jobNumber": { "type": "string", "maxLength": 32 },
+        "customerUid": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 100 },
+        "customerPhone": { "type": "string", "maxLength": 15 },
+        "phoneBrand": { "type": "string", "maxLength": 50 },
+        "phoneModel": { "type": "string", "maxLength": 80 },
+        "imei": { "type": "string", "maxLength": 20 },
+        "problem": { "type": "string", "maxLength": 500 },
+        "accessoriesReceived": { "type": "string", "maxLength": 200 },
+        "estimatedCost": { "type": "number" },
+        "advancePaid": { "type": "number" },
+        "technicianUid": { "type": "string", "maxLength": 128 },
+        "expectedDeliveryDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["received", "diagnosing", "in_repair", "ready", "delivered", "cancelled"] },
+        "partsUsed": { "type": "string", "maxLength": 500 },
+        "finalAmount": { "type": "number" },
+        "repairInvoiceId": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["repairId", "jobNumber", "customerName", "customerPhone", "problem", "status"]
+    }
+  },
+  "firestore": {
+    "/customers/{customerUid}": {
+      "schema": "Customer",
+      "description": "Stores individual customer profiles"
+    },
+    "/staffUsers/{staffUid}": {
+      "schema": "StaffUser",
+      "description": "Stores store staff, cashier, technician, and owner profiles"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Product catalog with prices, stock, and specifications"
+    },
+    "/emiEnquiries/{enquiryId}": {
+      "schema": "EmiEnquiry",
+      "description": "Customer EMI financing applications"
+    },
+    "/repairJobs/{repairId}": {
+      "schema": "RepairJob",
+      "description": "Repair tickets and repair job status"
+    }
+  }
+}

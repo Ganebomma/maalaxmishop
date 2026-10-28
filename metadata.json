@@ -1,0 +1,6 @@
+{
+  "name": "Maa Lakshmi Mobile & Electronics",
+  "description": "Smartphones, Accessories, Repairs & Easy 0% EMI in Surat, Gujarat. Complete storefront and secure administrative ERP.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

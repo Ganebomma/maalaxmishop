@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isStaff() {
+      return isSignedIn() && exists(/databases/$(database)/documents/staffUsers/$(request.auth.uid));
+    }
+
+    function getStaffData() {
+      return get(/databases/$(database)/documents/staffUsers/$(request.auth.uid)).data;
+    }
+
+    function isOwnerOrManager() {
+      return isStaff() && (getStaffData().role == 'owner' || getStaffData().role == 'manager');
+    }
+
+    function isCustomerOwner(customerUid) {
+      return isSignedIn() && request.auth.uid == customerUid;
+    }
+
+    // 1. Customers Collection
+    match /customers/{customerUid} {
+      allow get: if isCustomerOwner(customerUid) || isStaff();
+      allow list: if isStaff();
+      allow create: if isSignedIn() && request.auth.uid == customerUid;
+      allow update: if (isCustomerOwner(customerUid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'uid'])) || isOwnerOrManager();
+      allow delete: if isOwnerOrManager();
+    }
+
+    // 2. Staff Users Collection
+    match /staffUsers/{staffUid} {
+      allow get: if isStaff();
+      allow list: if isOwnerOrManager();
+      allow write: if isStaff() && getStaffData().role == 'owner';
+    }
+
+    // 3. Products Catalog
+    match /products/{productId} {
+      allow read: if resource.data.isActive == true || isStaff();
+      allow write: if isOwnerOrManager();
+    }
+
+    // 4. IMEI Stock Tracking
+    match /imeiStock/{imeiId} {
+      allow read, write: if isStaff();
+    }
+
+    // 5. Invoices & Billing
+    match /invoices/{invoiceId} {
+      allow get: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow list: if isStaff();
+      allow write: if isStaff() && (getStaffData().role == 'owner' || getStaffData().role == 'manager' || getStaffData().role == 'cashier');
+    }
+
+    // 6. EMI Plans & Installment Payments
+    match /emiPlans/{planId} {
+      allow get: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow list: if isStaff();
+      allow write: if isOwnerOrManager();
+    }
+
+    match /emiPayments/{paymentId} {
+      allow get: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow list: if isStaff();
+      allow write: if isStaff() && (getStaffData().role == 'owner' || getStaffData().role == 'manager' || getStaffData().role == 'cashier');
+    }
+
+    // 7. EMI Enquiries
+    match /emiEnquiries/{enquiryId} {
+      allow create: if request.resource.data.customerName is string && request.resource.data.mobileNumber is string;
+      allow get: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow list: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow update, delete: if isOwnerOrManager();
+    }
+
+    // 8. Repair Jobs
+    match /repairJobs/{repairId} {
+      allow create: if isStaff() || (request.resource.data.customerName is string && request.resource.data.customerPhone is string);
+      allow get: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow list: if (isSignedIn() && resource.data.customerUid == request.auth.uid) || isStaff();
+      allow update: if isStaff();
+      allow delete: if isOwnerOrManager();
+    }
+
+    // 9. Expenses
+    match /expenses/{expenseId} {
+      allow read, write: if isOwnerOrManager();
+    }
+
+    // 10. Offers & Banners
+    match /offers/{offerId} {
+      allow read: if true;
+      allow write: if isOwnerOrManager();
+    }
+
+    // 11. App Settings
+    match /appSettings/{settingsId} {
+      allow read: if true;
+      allow write: if isStaff() && getStaffData().role == 'owner';
+    }
+
+    // 12. Wishlists & Customer Notifications
+    match /wishlists/{wishlistId} {
+      allow read, write: if isSignedIn() && (wishlistId == request.auth.uid || resource.data.customerUid == request.auth.uid);
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.targetUid == request.auth.uid;
+      allow write: if isStaff();
+    }
+  }
+}

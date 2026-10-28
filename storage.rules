@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Public Assets (Products & Banners)
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /banners/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /shop/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Customer Private Documents
+    match /customers/{customerUid}/{allPaths=**} {
+      allow read: if request.auth != null && (request.auth.uid == customerUid);
+      allow write: if request.auth != null && (request.auth.uid == customerUid);
+    }
+    match /kyc/{customerUid}/{allPaths=**} {
+      allow read: if request.auth != null && (request.auth.uid == customerUid);
+      allow write: if request.auth != null && (request.auth.uid == customerUid);
+    }
+
+    // Invoices and EMI Receipts
+    match /invoices/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /emi-agreements/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /emi-receipts/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /repair-documents/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
